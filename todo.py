@@ -3,6 +3,7 @@ import json # работа с json файлом
 import os # проверка наличие файла
 import subprocess # модуль работы с внешними процессами (современнный стандарт)
 import time # модуль работы со временем
+from datetime import datetime, timedelta # модуль для работы со временем
 
 filename = "tasks.json" # название файла, где хранятся задачи
 
@@ -74,13 +75,17 @@ def add_task():
         return
     
     new_id = len(tasks) + 1
+
+    # получаем текущую дату и время
+    current_time = datetime.now().strftime("%d.%m.%Y %H:%M")
     
     # создание новой задачи
     new_task = {
         # устарело -> 'id': len(tasks) + 1, # простой способ сделать уникальный id (id могут повторяться при удалении (неидеально, но как учебный проект ок, можно хранить счетчик отдельно))
         'id': new_id,
         'title': title,
-        'completed': False
+        'completed': False,
+        'created_at': current_time # добавлние даты создания
     }
 
     # добавление задачи в список
@@ -136,8 +141,11 @@ def complete_task():
     # выводим список невыполненных задач
     print("Невыполенные задачи:")
     for task in incomplete_tasks:
-        status = "❌" if not task['completed'] else "✅"
-        print(f" {status} [{task['id']}] {task['title']}")
+        # добавляем дату создания, если есть
+        date_info = ""
+        if 'created_at' in task:
+            date_info = f" (создано: {task['created_at']})"
+        print(f" ❌ [{task['id']}] {task['title']}{date_info}")
     
     # просим ввести ID
     try:
@@ -151,9 +159,27 @@ def complete_task():
         if task['id'] == task_id:
             if  task['completed']: #проверяем, не выполнена ли уже
                 print(f"Задача '{task['title']}' уже отмечена как выполненная")
+                if 'completed_at' in task:
+                    print(f" ✅ Выполнено: {task['completed_at']}")
             else:
+                # получаем такущую дату и время
+                current_time = datetime.now().strftime("%d.%m.%Y %H:%M")
                 task['completed'] = True # отмечаем как выполненную
-                print(f"Задача '{task['title']}' отмечена как выполеннная")
+                task['completed_at'] = current_time
+                print(f" ✅ Задача '{task['title']}' отмечена как выполеннная")
+                print(f" 📆 Создано: {task.get('created_at', 'неизвестно')}")
+                print(f" ✅ Выполнено: {current_time}")
+
+                # если есть дата создания, показываем сколько дней заняло
+                # if 'created_at' in task:
+                #     try:
+                #         created = datetime.strptime(task['created_at'], "%d.%m.%Y %H:%M")
+                #         now = datetime.now()
+                #         days_taken = (now - created).days
+                #         print(f" ⏱️ Заняло дней: {days_taken}")
+                #     except:
+                #         pass #если что-то пошло не так, просто пропускаем
+
                 save_tasks()
             return
     
@@ -172,6 +198,14 @@ def show_tasks():
     for task in tasks:
         status = "✅" if task['completed'] else "❌"
         print(f"{status} [{task['id']}] {task['title']}")
+
+        # добавление даты
+        if 'created_at' in task: # дата создания
+            print(f" 📆 Создано: {task['created_at']}")
+        if task['completed'] and 'completed_at' in task: # дата выполнения
+            print(f" ✅ Выполнено: {task['completed_at']}")
+
+        print()
 
     # считаем статистику
     total = len(tasks)
