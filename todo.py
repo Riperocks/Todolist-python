@@ -15,6 +15,7 @@ tasks = [] # список задач
 
 # пересборка ID
 def rebuild_ids():
+    # Пересборка используется для простоты в данном проекте, однако лучше хранить счетчик отдельно, чтобы не ломать ссылки на задачи или использовать UUID (универсальные идентификаторы, но ID будут выглядеть как случайные числа)
     """Переназначает ID всем задачам по порядку"""
     for i, task in enumerate(tasks, start=1):
         task['id'] = i
@@ -72,16 +73,19 @@ def add_task():
         print("Ошибка: название не может быть пустым")
         return
     
+    new_id = len(tasks) + 1
+    
     # создание новой задачи
     new_task = {
-        'id': len(tasks) + 1, # простой способ сделать уникальный id (id могут повторяться при удалении (неидеально, но как учебный проект ок, можно хранить счетчик отдельно))
+        # устарело -> 'id': len(tasks) + 1, # простой способ сделать уникальный id (id могут повторяться при удалении (неидеально, но как учебный проект ок, можно хранить счетчик отдельно))
+        'id': new_id,
         'title': title,
         'completed': False
     }
 
     # добавление задачи в список
     tasks.append(new_task) #append метод списка, добавляет элемент в конец
-    print(f"Задача '{title}' успешно добавлена с ID {new_task['id']}")
+    print(f"Задача '{title}' успешно добавлена с ID {new_id}")
     save_tasks() # сразу сохраняем в файл
 
 # функция удаления задачи
@@ -98,7 +102,7 @@ def delete_task():
     try: # try - "попробуй выполнить следующий код, в случае ошибки перейдет в except"
         task_id = int(input("Введите ID задачи для удаления: "))
     except ValueError: # except - "если случилась ошибка, то выполняй это", но ошибка должна быть конкретизированной ValueError (неправильное значение, в нашем случае если строка не число типа int)
-        print("Ошибка: ввидите число")
+        print("Ошибка: введите ID")
         return
 
     # Ищем задачу с таким ID для удаления
@@ -108,6 +112,7 @@ def delete_task():
             deleted_title = task['title']
             # удаляем задачу из списка
             tasks.pop(i) # метод списка, который удаляет элемент с индексом i
+            rebuild_ids()
             print(f"Задача '{deleted_title}' удалена")
             save_tasks() # сохраняем изменения
             return
@@ -138,7 +143,7 @@ def complete_task():
     try:
         task_id = int(input("Введите ID задачи, которую выполнили: "))
     except ValueError:
-        print("ошибка: введите число")
+        print("Ошибка: введите ID")
         return
     
     # ищем задачу
@@ -205,15 +210,19 @@ def main():
         
     # проверяем выбор пользователя и вызываем нужную функцию
         if choice == "1":
+            clear_screen()
             add_task()
             pause_and_clear()
         elif choice == "2":
+            clear_screen()
             show_tasks()
             pause_and_clear()
         elif choice == "3":
+            clear_screen()
             complete_task()
             pause_and_clear()
         elif choice == "4":
+            clear_screen()
             delete_task()
             pause_and_clear()
         elif choice == "5":
@@ -222,7 +231,9 @@ def main():
             pause_and_clear()
             break #выход из цикла
         else:
+            clear_screen()
             print("Ошибка: нет такого действия")
+            #pause_and_clear()
 
 # условие гарантирует, что код выполнится только если файл запущен напрямую
 if __name__ == "__main__":
