@@ -24,8 +24,8 @@ python main.py
 
 ## 📦 Зависимости
 
-Python 3.9+
-Стандартные библиотеки (json, os, datetime и др.)
+- Python 3.9+
+- Стандартные библиотеки (json, os, datetime и др.)
 
 ## 📁 Структура проекта
 
