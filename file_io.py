@@ -41,7 +41,6 @@ def load_tasks():
 
     else:
         logging.warning("Файл с задачами не найден")
-        print("Файл с задачами не найден, начинаем с пустого списка")
         tasks = []
     
     logging.debug(f"load_tasks() возвращает {len(tasks)} задач")
