@@ -5,7 +5,7 @@ __pycache__/
 *.pyd
 .pytest_cache/
 *.spec
-*.json
+tasks.json
 
 build/
 
